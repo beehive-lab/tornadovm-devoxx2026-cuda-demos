@@ -1192,3 +1192,20 @@ kernel time under nsys, 3 runs, spread ≤ 0.9%, every rung validated on the ful
   `cp.async`, an A-side swizzle and deeper pipelines are the candidates the API lacks.
 - Re-tune demo 25 on sm_120: every tuned choice here (shape, tiling, hint) is sm_89-specific.
 
+## Batch 46 — Demo 26: a JVector index built on the GPU (2026-10-01)
+
+Deliverable: `demos/26-jvector-gpu-index/` (`JVectorGpuIndex.java`, `setup.sh`, `run.sh`, `README.md`). All Observed,
+evidence in `results/raw/46-jvector-gpu-index/` (`MANIFEST.md`):
+
+- The same JVector graph (M=32, beam 100, alpha 1.2, hierarchy, cosine) is built with the GPU accelerator from the
+  JVector `jvector-gpu` module (cuVS NN-Descent + a TornadoVM `ctx.mma` pruning kernel) and with JVector's CPU builder.
+  Both are searched against exact neighbors of 200 held-out queries; `PASSED` requires the GPU recall@10 to be at least
+  the CPU's minus 0.01.
+- 500k × 1024 synthetic (default): GPU 6.4–6.5 s vs CPU 47.6–48.2 s (7.4×), about 59 s end to end, PASSED via both
+  the `tornado` launcher and `java @argfile`. Real ada002 99k × 1536 (`--fvecs`): 2.56 s vs 15.83 s (6.2×), recall
+  0.9940 vs 0.9905.
+- Runs on a source-built TornadoVM with PR #1155 (`tornado-cuvs`), not the default `sdkman-7.0.0` profile, so it is
+  outside `scripts/run-all-demos.sh` (like demos 09/10); the 69/69 contract is unchanged.
+- Found while building it: the `tornado` launcher swallows program arguments starting with `--` (TornadoVM #1150);
+  `run.sh` passes them with `--params`.
+
