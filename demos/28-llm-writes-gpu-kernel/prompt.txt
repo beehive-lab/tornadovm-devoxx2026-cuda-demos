@@ -1,0 +1,1 @@
+Write the kernel static void mandelbrot(int width, int height, int maxIterations, IntArray out). For every pixel (x, y) map x to the real axis from -2.2 to 1.0 and y to the imaginary axis from -1.2 to 1.2, iterate z = z*z + c with floats until |z| > 2 or maxIterations, and store the iteration count at out[y * width + x]. Use two nested @Parallel loops, y outer and x inner.

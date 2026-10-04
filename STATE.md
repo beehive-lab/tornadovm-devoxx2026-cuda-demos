@@ -1233,3 +1233,24 @@ All Observed; evidence is in `results/raw/47-jvector-gpu-showcase/` (`MANIFEST.m
     relative distance difference ≤ 1.5e-7. The check accepts ties and nothing else.
 - **Demo 26's `setup.sh`** gained `JVECTOR_LIB` (output directory). Demo 27's setup reuses it; demo 26's default
   behaviour is unchanged.
+
+## Batch 48 — Demo 28: an LLM in Java writes a GPU kernel in Java (2026-10-04)
+
+Deliverable: `demos/28-llm-writes-gpu-kernel/` (`run.sh`, `Harness.template`, `render.py`, the prompts,
+`reference.kernel`, `README.md`). All Observed; evidence is in `results/raw/48-llm-writes-gpu-kernel/`
+(`MANIFEST.md`).
+
+- **What it does:** jitLLM runs Qwen3-4B F16 on the GPU and writes a Mandelbrot kernel as a Java method with
+  `@Parallel` loops. The raw output is kept as `generation.out`.
+  - `run.sh` inserts the method into a fixed harness. TornadoVM 7.0.0 JIT-compiles it to CUDA (printed) and runs it
+    on 4096 × 3072 pixels.
+  - The same method then runs as plain Java on one CPU thread.
+  - The demo checks the pixel agreement and draws the fractal from the GPU's output.
+- **Results:** GPU 3.1 ms vs CPU 1,166–1,186 ms; 99.79% of 12.6M pixels identical (the rest is float rounding at
+  the set's edge). `PASSED` live (tornado) and with `--reference` both ways (tornado, `java @argfile`).
+- **Determinism:** greedy decoding gives a byte-identical kernel across runs. `--reference` runs that kernel without
+  jitLLM, so anyone with the 7.0.0 SDK can reproduce the GPU half.
+- **Rejected while building it:** whole-program generation (both models) and Llama-3.2-3B (its kernel did not
+  compile).
+- **Outside `scripts/run-all-demos.sh`:** live generation needs jitLLM and a 7.5 GB model. The 69/69 contract is
+  unchanged.

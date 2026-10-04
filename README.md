@@ -106,10 +106,12 @@ demo compiles and passes under both run paths (`results/raw/45-tile-ladder/run-a
 | [24](demos/24-cutile-histogram/) † | `CuTileHistogram` | Tile atomics: `PartitionView.atomicAdd` into 256 bins |
 | [25](demos/25-tile-ladder/) † | `TileLadder` | **The TileContext ladder** vs. a fully optimised KernelContext GEMM vs. native CUDA Tile |
 | [26](demos/26-jvector-gpu-index/) ‡ | `JVectorGpuIndex` | A **JVector vector index built on the GPU** (cuVS + a tensor-core Java kernel) vs. JVector's own CPU build: 7.4× faster at 500k × 1024, recall matched, in about a minute |
+| [28](demos/28-llm-writes-gpu-kernel/) § | `Harness` | **An LLM in Java writes a GPU kernel in Java**: jitLLM (Qwen3-4B) writes a `@Parallel` Mandelbrot method, TornadoVM compiles it to CUDA, it runs in 3.1 ms vs 1.2 s for the same method on one CPU thread, and the fractal is drawn in the terminal |
 | [27](demos/27-jvector-gpu-showcase/) ‡ | `JVectorShowcase` | **The JVector GPU showcase**, five acts on real ada-002 embeddings: build 8× at 100k (live race) and 28× at 1M, a better graph for search, compaction 20×, PQ 3.7× |
 
 **‡** = needs a TornadoVM SDK with `tornado-cuvs` (PR #1155) and its own `setup.sh`; not part of
-`run-all-demos.sh`.
+`run-all-demos.sh`. **§** = the kernel runs on 7.0.0 (`--reference` needs nothing else); live generation needs
+[jitLLM](https://github.com/beehive-lab/jitllm) and a 7.5 GB model; not part of `run-all-demos.sh`.
 
 Each demo's README has its build/run commands, expected output, profiling recipe and a
 fallback for when it misbehaves on stage. [`demos/README.md`](demos/README.md) has the long
