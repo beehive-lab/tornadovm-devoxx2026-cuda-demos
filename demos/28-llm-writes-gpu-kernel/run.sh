@@ -5,10 +5,17 @@
 #   bash demos/28-llm-writes-gpu-kernel/run.sh [tornado|java]               generate live with jitLLM, then run
 #   bash demos/28-llm-writes-gpu-kernel/run.sh [tornado|java] --reference   skip jitLLM: run the kernel the model
 #                                                                             wrote for this prompt in rehearsal
+#   bash demos/28-llm-writes-gpu-kernel/run.sh dashboard                     the full-screen live version (~30 s): every
+#       component lit while it works, nvidia-smi showing both processes on the one GPU, a live zoom (dashboard/)
 # Needs: source scripts/setup-env.sh (TornadoVM 7.0.0 runs the kernel). Live generation also needs a built jitLLM:
 #   JITLLM_DIR=<clone of beehive-lab/jitllm, built>  JITLLM_JAVA_HOME=<its JDK 21>  MODEL=<Qwen3-4B-f16.gguf>
 set -euo pipefail
 here="$(cd "$(dirname "$0")" && pwd)"
+if [ "${1:-}" = dashboard ]; then
+    [ -n "${TORNADOVM_HOME:-}" ] || { echo "run.sh: TORNADOVM_HOME is not set (source scripts/setup-env.sh)" >&2; exit 1; }
+    : "${JITLLM_DIR:?set JITLLM_DIR, JITLLM_JAVA_HOME and MODEL (see README.md)}" "${JITLLM_JAVA_HOME:?}" "${MODEL:?}"
+    exec python3 "$here/dashboard/dashboard.py" "$here/build/dashboard"
+fi
 mode=tornado
 case "${1:-}" in tornado|java) mode="$1"; shift ;; esac
 reference=false

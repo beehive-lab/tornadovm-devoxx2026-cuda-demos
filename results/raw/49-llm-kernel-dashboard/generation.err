@@ -1,0 +1,4 @@
+WARNING: Using incubator modules: jdk.incubator.vector
+
+==== Performance Metrics ====
+achieved tok/s: 66.90. Tokens: 644, seconds: 9.63

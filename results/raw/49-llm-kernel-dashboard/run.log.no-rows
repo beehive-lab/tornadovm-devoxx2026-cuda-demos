@@ -1,0 +1,295 @@
+WARNING: module-info.class ignored in patch: /home/michalis/.sdkman/candidates/tornadovm/7.0.0-jdk22plus-cuda/share/java/jvmci/jvmci-21.0.2.jar
+PHASE check
+WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::objectFieldOffset has been called by uk.ac.manchester.tornado.runtime.TornadoVMConfigAccess (file:/home/michalis/.sdkman/candidates/tornadovm/7.0.0-jdk22plus-cuda/share/java/tornado/tornado-runtime-7.0.0.jar)
+WARNING: Please consider reporting this to the maintainers of class uk.ac.manchester.tornado.runtime.TornadoVMConfigAccess
+WARNING: sun.misc.Unsafe::objectFieldOffset will be removed in a future release
+extern "C" __global__ void mandelbrot(long long *_kernel_context, unsigned char *_constant_region, unsigned char *_local_region, int *_atomics, int arg0, int arg1, int arg2, unsigned char *arg3, unsigned char *arg4)
+{
+  unsigned long long ul_0, ul_1, ul_4, ul_5, ul_6, ul_44; 
+  int i_2, i_3, i_7, i_8, i_9, i_10, i_11, i_18, i_38, i_39, i_40, i_45, i_46; 
+  float f_12, f_13, f_14, f_15, f_16, f_17, f_19, f_20, f_21, f_22, f_23, f_24, f_25, f_26, f_27, f_28, f_29, f_30, f_31, f_32, f_33, f_34, f_35, f_36, f_37; 
+  long long l_41, l_42, l_43; 
+
+  // BLOCK 0
+  ul_0  =  (unsigned long long) arg3;
+  ul_1  =  (unsigned long long) arg4;
+  i_2  =  (gridDim.x*blockDim.x);
+  i_3  =  (gridDim.y*blockDim.y);
+  ul_4  =  ul_0 + 20L;
+  ul_5  =  ul_0 + 24L;
+  ul_6  =  ul_0 + 16L;
+  i_7  =  (blockIdx.x*blockDim.x+threadIdx.x);
+  i_8  =  (blockIdx.y*blockDim.y+threadIdx.y);
+  // BLOCK 1 MERGES [0 11 ]
+  i_9  =  i_8;
+  for(;i_9 < 768;)
+  {
+    // BLOCK 2
+    i_10  =  i_9 << 10;
+    // BLOCK 3 MERGES [2 10 ]
+    i_11  =  i_7;
+    for(;i_11 < 1024;)
+    {
+      // BLOCK 4
+      f_12  =  *(( float *) ul_6);
+      f_13  =  *(( float *) ul_5);
+      f_14  =  *(( float *) ul_4);
+      f_15  =  *(( float *) ul_5);
+      // BLOCK 5 MERGES [4 7 ]
+      f_16  =  0.0F;
+      f_17  =  0.0F;
+      i_18  =  0;
+      for(;i_18 < 256;)
+      {
+        // BLOCK 6
+        f_19  =  (float) i_11;
+        f_20  =  f_19 / 1024.0F;
+        f_21  =  f_20 - 0.5F;
+        f_22  =  f_21 * f_13;
+        f_23  =  f_22 * 1024.0F;
+        f_24  =  f_23 / 768.0F;
+        f_25  =  f_24 + f_12;
+        f_26  =  f_16 * f_16;
+        f_27  =  f_17 * f_17;
+        f_28  =  f_26 - f_27;
+        f_29  =  f_25 + f_28;
+        f_30  =  f_16 * 2.0F;
+        f_31  =  (float) i_9;
+        f_32  =  f_31 / 768.0F;
+        f_33  =  f_32 - 0.5F;
+        f_34  =  fma(f_33, f_15, f_14);
+        f_35  =  fma(f_17, f_30, f_34);
+        f_36  =  f_35 * f_35;
+        f_37  =  fma(f_29, f_29, f_36);
+        i_38  =  ((4.0F) < (f_37));
+        if(i_38 == 1)
+        {
+          // BLOCK 8
+          break;
+        }  // B6
+        else
+        {
+          // BLOCK 7
+          i_39  =  i_18 + 1;
+          f_16  =  f_29;
+          f_17  =  f_35;
+          i_18  =  i_39;
+        }  // B6
+      }  // B5
+      // BLOCK 9
+      // BLOCK 10 MERGES [9 8 ]
+      i_40  =  i_10 + i_11;
+      l_41  =  (long long) i_40;
+      l_42  =  l_41 + 4L;
+      l_43  =  l_42 << 2;
+      ul_44  =  ul_1 + l_43;
+      *(( int *) ul_44)  =  i_18;
+      i_45  =  i_2 + i_11;
+      i_11  =  i_45;
+    }  // B3
+    // BLOCK 11
+    i_46  =  i_3 + i_9;
+    i_9  =  i_46;
+  }  // B1
+  // BLOCK 12
+  return;
+}  //  kernel
+
+MATCH 785373 786432
+PHASE zoom
+extern "C" __global__ void mandelbrot(long long *_kernel_context, unsigned char *_constant_region, unsigned char *_local_region, int *_atomics, int arg0, int arg1, int arg2, unsigned char *arg3, unsigned char *arg4)
+{
+  unsigned long long ul_0, ul_1, ul_4, ul_5, ul_6, ul_46; 
+  int i_2, i_3, i_7, i_8, i_9, i_10, i_11, i_12, i_13, i_20, i_40, i_41, i_42, i_47, i_48; 
+  float f_14, f_15, f_16, f_17, f_18, f_19, f_21, f_22, f_23, f_24, f_25, f_26, f_27, f_28, f_29, f_30, f_31, f_32, f_33, f_34, f_35, f_36, f_37, f_38, f_39; 
+  long long l_43, l_44, l_45; 
+
+  // BLOCK 0
+  ul_0  =  (unsigned long long) arg3;
+  ul_1  =  (unsigned long long) arg4;
+  i_2  =  (gridDim.x*blockDim.x);
+  i_3  =  (gridDim.y*blockDim.y);
+  ul_4  =  ul_0 + 20L;
+  ul_5  =  ul_0 + 24L;
+  ul_6  =  ul_0 + 16L;
+  i_7  =  (blockIdx.x*blockDim.x+threadIdx.x);
+  i_8  =  (blockIdx.y*blockDim.y+threadIdx.y);
+  // BLOCK 1 MERGES [0 11 ]
+  i_9  =  i_8;
+  for(;i_9 < 4320;)
+  {
+    // BLOCK 2
+    i_10  =  i_9 << 13;
+    i_11  =  i_9 << 9;
+    i_12  =  i_10 - i_11;
+    // BLOCK 3 MERGES [2 10 ]
+    i_13  =  i_7;
+    for(;i_13 < 7680;)
+    {
+      // BLOCK 4
+      f_14  =  *(( float *) ul_6);
+      f_15  =  *(( float *) ul_5);
+      f_16  =  *(( float *) ul_4);
+      f_17  =  *(( float *) ul_5);
+      // BLOCK 5 MERGES [4 7 ]
+      f_18  =  0.0F;
+      f_19  =  0.0F;
+      i_20  =  0;
+      for(;i_20 < 2000;)
+      {
+        // BLOCK 6
+        f_21  =  (float) i_13;
+        f_22  =  f_21 / 7680.0F;
+        f_23  =  f_22 - 0.5F;
+        f_24  =  f_23 * f_15;
+        f_25  =  f_24 * 7680.0F;
+        f_26  =  f_25 / 4320.0F;
+        f_27  =  f_26 + f_14;
+        f_28  =  f_18 * f_18;
+        f_29  =  f_19 * f_19;
+        f_30  =  f_28 - f_29;
+        f_31  =  f_27 + f_30;
+        f_32  =  f_18 * 2.0F;
+        f_33  =  (float) i_9;
+        f_34  =  f_33 / 4320.0F;
+        f_35  =  f_34 - 0.5F;
+        f_36  =  fma(f_35, f_17, f_16);
+        f_37  =  fma(f_19, f_32, f_36);
+        f_38  =  f_37 * f_37;
+        f_39  =  fma(f_31, f_31, f_38);
+        i_40  =  ((4.0F) < (f_39));
+        if(i_40 == 1)
+        {
+          // BLOCK 8
+          break;
+        }  // B6
+        else
+        {
+          // BLOCK 7
+          i_41  =  i_20 + 1;
+          f_18  =  f_31;
+          f_19  =  f_37;
+          i_20  =  i_41;
+        }  // B6
+      }  // B5
+      // BLOCK 9
+      // BLOCK 10 MERGES [9 8 ]
+      i_42  =  i_12 + i_13;
+      l_43  =  (long long) i_42;
+      l_44  =  l_43 + 4L;
+      l_45  =  l_44 << 2;
+      ul_46  =  ul_1 + l_45;
+      *(( int *) ul_46)  =  i_20;
+      i_47  =  i_2 + i_13;
+      i_13  =  i_47;
+    }  // B3
+    // BLOCK 11
+    i_48  =  i_3 + i_9;
+    i_9  =  i_48;
+  }  // B1
+  // BLOCK 12
+  return;
+}  //  kernel
+
+FRAME 0 31.28 2.600000
+FRAME 1 9.99 2.418000
+FRAME 2 12.88 2.248740
+FRAME 3 13.59 2.091328
+FRAME 4 11.70 1.944935
+FRAME 5 12.06 1.808790
+FRAME 6 14.53 1.682174
+FRAME 7 13.23 1.564422
+FRAME 8 14.12 1.454913
+FRAME 9 16.72 1.353069
+FRAME 10 15.30 1.258354
+FRAME 11 15.86 1.170269
+FRAME 12 18.64 1.088350
+FRAME 13 17.34 1.012166
+FRAME 14 17.24 0.941314
+FRAME 15 19.91 0.875422
+FRAME 16 19.30 0.814143
+FRAME 17 18.57 0.757153
+FRAME 18 19.37 0.704152
+FRAME 19 20.39 0.654861
+FRAME 20 19.38 0.609021
+FRAME 21 21.27 0.566390
+FRAME 22 21.14 0.526742
+FRAME 23 20.39 0.489870
+FRAME 24 21.03 0.455579
+FRAME 25 21.90 0.423689
+FRAME 26 20.83 0.394031
+FRAME 27 20.63 0.366449
+FRAME 28 21.94 0.340797
+FRAME 29 21.90 0.316941
+FRAME 30 21.01 0.294755
+FRAME 31 22.12 0.274123
+FRAME 32 21.85 0.254934
+FRAME 33 20.86 0.237089
+FRAME 34 21.45 0.220492
+FRAME 35 21.78 0.205058
+FRAME 36 20.81 0.190704
+FRAME 37 21.02 0.177355
+FRAME 38 21.77 0.164940
+FRAME 39 20.36 0.153394
+FRAME 40 20.08 0.142656
+FRAME 41 21.14 0.132670
+FRAME 42 20.80 0.123384
+FRAME 43 19.57 0.114747
+FRAME 44 20.95 0.106714
+FRAME 45 20.39 0.099244
+FRAME 46 18.93 0.092297
+FRAME 47 18.92 0.085836
+FRAME 48 20.12 0.079828
+FRAME 49 19.50 0.074240
+FRAME 50 18.52 0.069043
+FRAME 51 19.51 0.064210
+FRAME 52 17.35 0.059715
+FRAME 53 17.03 0.055535
+FRAME 54 18.19 0.051648
+FRAME 55 17.31 0.048033
+FRAME 56 15.75 0.044670
+FRAME 57 17.85 0.041543
+FRAME 58 16.70 0.038635
+FRAME 59 15.14 0.035931
+FRAME 60 17.08 0.033416
+FRAME 61 16.65 0.031077
+FRAME 62 14.55 0.028901
+FRAME 63 17.26 0.026878
+FRAME 64 16.62 0.024997
+FRAME 65 14.67 0.023247
+FRAME 66 15.54 0.021620
+FRAME 67 16.53 0.020106
+FRAME 68 15.27 0.018699
+FRAME 69 15.60 0.017390
+FRAME 70 16.91 0.016173
+FRAME 71 15.19 0.015041
+FRAME 72 15.76 0.013988
+FRAME 73 17.00 0.013009
+FRAME 74 14.37 0.012098
+FRAME 75 14.00 0.011251
+FRAME 76 14.75 0.010464
+FRAME 77 16.04 0.009731
+FRAME 78 13.33 0.009050
+FRAME 79 15.66 0.008416
+FRAME 80 14.05 0.007827
+FRAME 81 11.67 0.007279
+FRAME 82 14.51 0.006770
+FRAME 83 13.43 0.006296
+FRAME 84 10.69 0.005855
+FRAME 85 13.04 0.005445
+FRAME 86 12.40 0.005064
+FRAME 87 9.71 0.004710
+FRAME 88 12.14 0.004380
+FRAME 89 10.40 0.004073
+FRAME 90 9.25 0.003788
+FRAME 91 10.45 0.003523
+FRAME 92 11.58 0.003276
+FRAME 93 10.79 0.003047
+FRAME 94 10.76 0.002834
+FRAME 95 10.39 0.002635
+FRAME 96 11.58 0.002451
+FRAME 97 8.48 0.002279
+FRAME 98 11.19 0.002120
+FRAME 99 10.14 0.001971
+END

@@ -1254,3 +1254,26 @@ Deliverable: `demos/28-llm-writes-gpu-kernel/` (`run.sh`, `Harness.template`, `r
   compile).
 - **Outside `scripts/run-all-demos.sh`:** live generation needs jitLLM and a 7.5 GB model. The 69/69 contract is
   unchanged.
+
+## Batch 49 — Demo 28's live dashboard (2026-10-05)
+
+Deliverable: `demos/28-llm-writes-gpu-kernel/dashboard/` (`dashboard.py`, `Harness.template`, `prompt.txt`,
+`reference.kernel`, `screenshots/`) and `run.sh dashboard`. All Observed; evidence is in
+`results/raw/49-llm-kernel-dashboard/` (`MANIFEST.md`).
+
+- **What it shows:** a full-screen view where each component lights up while active: the jitLLM engine, the
+  generated Java, javac, the TornadoVM JIT, and the running kernel. A GPU panel polls `nvidia-smi` and attributes
+  each GPU process to the component that started it (through `/proc` parents).
+- **One run:**
+  - jitLLM `achieved tok/s: 66.90. Tokens: 644, seconds: 9.63` (prompt + answer);
+  - the live kernel is byte-identical to the rehearsal one, and javac is clean;
+  - GPU = CPU on 99.87% of pixels;
+  - 100 zoom frames at 8K, median 16.72 ms;
+  - nvidia-smi saw the jitLLM process (8,632 MiB) and then the kernel's process (516 MiB) on the same device.
+  - `PASSED` in 35.5 s.
+- **Design notes:**
+  - A 4K frame takes about 4 ms, so a fast zoom was invisible to nvidia-smi (0% sampled). The dashboard renders 8K
+    frames and paces them at ~12 frames/s, which keeps the kernel's process on the GPU for ~8 s at 10–39%
+    utilization.
+  - The view switches to CUDA only for the first kernel TornadoVM prints; the zoom's task graph prints a second copy.
+- **Outside `scripts/run-all-demos.sh`** (interactive, needs jitLLM). The 69/69 contract is unchanged.

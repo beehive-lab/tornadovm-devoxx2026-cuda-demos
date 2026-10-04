@@ -23,6 +23,43 @@ compared pixel by pixel, and the fractal is drawn in the terminal from the GPU's
 LlmGpuKernel: PASSED -- the generated kernel ran on the GPU and matches the CPU on >= 99% of pixels
 ```
 
+## The dashboard: `run.sh dashboard`
+
+A full-screen live version for the stage (terminal ≥ 120 × 40, ~30 s). It makes one point obvious: **one GPU, two
+Java workloads**. The Java LLM engine runs on the GPU and writes Java, and that Java then runs on the same GPU.
+
+![the javac step: the model's lines inside the harness](dashboard/screenshots/2-harness-javac.png)
+
+* **Pipeline row:** the five components are 1 jitLLM engine (Qwen3-4B), 2 generated Java, 3 javac, 4 TornadoVM JIT
+  (Java → CUDA) and 5 the kernel running. Each is lit (heavy border, spinner, elapsed time) while it works and
+  ticked with its time when done; the arrows light up as work flows.
+* **GPU panel:** it polls `nvidia-smi` for utilization, memory, and **which process holds the GPU**. Each process
+  is labelled and colored by the component that started it (matched through `/proc` parent PIDs).
+  * The utilization timeline covers the whole run, each sample colored by the active component: a magenta LLM
+    burst, then the cyan kernel load, on one device.
+  * "Seen on this GPU during the run" lists both processes.
+* **Content panel:**
+  1. The prompt is typed out in a chat bubble, then the model's code streams in under it.
+  2. The javac step shows extract → insert → compile: `Harness.java` with the model's lines marked yellow, arrows
+     at the TornadoVM `.task(...)` (on the GPU) and the plain `mandelbrot(...)` call (the same method on the CPU),
+     the `javac` command and the class size.
+  3. Next comes the CUDA TornadoVM generated.
+  4. Finally the kernel's own output: a zoom into Seahorse Valley, 100 frames at 7680 × 4320, one kernel execution
+     per frame, paced at ~12 frames/s so the load shows on `nvidia-smi`. It is drawn with half-blocks and
+     histogram colors.
+* **Prompts and fallback:** `dashboard/prompt.txt` holds the user prompt for this view (the kernel takes its view
+  window as a parameter, for the zoom), and the system prompt is the shared `system-prompt.txt`. If the live kernel
+  fails to compile, javac turns red and `dashboard/reference.kernel` runs, labelled.
+* **Logs:** `build/dashboard/`.
+
+```bash
+source scripts/setup-env.sh
+export JITLLM_DIR=~/jitllm JITLLM_JAVA_HOME=~/.sdkman/candidates/java/21.0.2-open MODEL=~/models/Qwen3-4B-f16.gguf
+bash demos/28-llm-writes-gpu-kernel/run.sh dashboard          # [enter] to leave; NO_PAUSE=1 exits by itself
+```
+
+Screenshots of a recorded run are in `dashboard/screenshots/` (generating, the javac step, the final screen).
+
 ## What is live, and what is fixed
 
 | part | source |

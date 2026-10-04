@@ -1,0 +1,25 @@
+<think>
+
+</think>
+
+```java
+static void mandelbrot(int width, int height, int maxIterations, FloatArray view, IntArray out) {
+    for (@Parallel int y = 0; y < height; y++) {
+        for (@Parallel int x = 0; x < width; x++) {
+            float re = view.get(0) + (x / (float) width - 0.5f) * view.get(2) * (float) width / (float) height;
+            float im = view.get(1) + (y / (float) height - 0.5f) * view.get(2);
+            float zx = 0.0f, zy = 0.0f, cx = re, cy = im;
+            int iter = 0;
+            while (iter < maxIterations) {
+                float zx2 = zx * zx - zy * zy + cx;
+                float zy2 = 2 * zx * zy + cy;
+                zx = zx2;
+                zy = zy2;
+                if (zx * zx + zy * zy > 4.0f) break;
+                iter++;
+            }
+            out.set(y * width + x, iter);
+        }
+    }
+}
+```
