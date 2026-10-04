@@ -6,12 +6,14 @@ Captured 2026-10-04 on the sm_89 host (`environment.txt`): RTX 4090, driver 610.
 
 | log | run | generation | GPU | CPU (same method, 1 thread) | pixels identical | verdict | wall |
 |---|---|---|---|---|---|---|---|
-| `run-tornado-live.log` | tornado, model writes the kernel live | 67.13 tok/s, 559 tokens (prompt + answer) in 8.33 s | 3.1 ms | 1,186.0 ms | 99.79% | PASSED | 15.4 s |
+| `run-tornado-live.log` | tornado, model writes the kernel live | 67.04 tok/s, 559 tokens (prompt + answer) in 8.34 s | 3.1 ms | 1,186.0 ms | 99.79% | PASSED | 15.4 s |
 | `run-java-argfile-reference.log` | java @argfile, `--reference` | none | 3.1 ms | 1,166.1 ms | 99.79% | PASSED | 2.3 s |
 | `run-tornado-reference.log` | tornado, `--reference` | none | 3.1 ms | 1,167.2 ms | 99.79% | PASSED | 2.4 s |
 
-* **The live kernel equals `reference.kernel`.** Byte-identical in this run and in five earlier rehearsal runs:
-  greedy decoding at temperature 0.
+* **The live kernel equals `reference.kernel`.** `generation.out` (the model's raw output) and `generation.err`
+  (jitLLM's metrics) are from the live run. The kernel extracted from `generation.out` is byte-identical to
+  `reference.kernel` (checked with `diff`), as it was in five earlier rehearsal runs: greedy decoding at
+  temperature 0.
 * **What the 0.21% non-identical pixels are:** float rounding at the set's edge. The GPU fuses multiply-adds, so
   near the escape threshold a pixel's iteration count can differ by one.
 * **Rejected alternatives, from the same day's rehearsal:**
