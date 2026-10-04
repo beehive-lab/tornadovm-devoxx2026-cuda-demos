@@ -20,6 +20,9 @@ GPU build of 500000 x 1024 (COSINE): rows 0.58 s, candidates 2.23 s (1 batches),
 JVectorGpuIndex: PASSED -- the GPU graph's recall@10 matches or beats JVector's
 ```
 
+For the full stage show (a live CPU-vs-GPU race, 1M vectors, search, compaction and PQ), see
+[demo 27](../27-jvector-gpu-showcase/).
+
 ## What does this demonstrate?
 
 **A real Java library, accelerated without leaving Java.** JVector builds its graph (DiskANN/Vamana-style, with

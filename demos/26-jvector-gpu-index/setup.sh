@@ -6,13 +6,15 @@
 #   source scripts/setup-env.sh          # with a TornadoVM SDK that has tornado-cuvs
 #   bash demos/26-jvector-gpu-index/setup.sh
 #
-# JVECTOR_REPO / JVECTOR_BRANCH select the JVector source (default: the PR branch).
+# JVECTOR_REPO / JVECTOR_BRANCH select the JVector source (default: the PR branch); JVECTOR_LIB the output
+# directory (default: lib/ next to this script; demo 27 uses its own).
 set -euo pipefail
 
 here="$(cd "$(dirname "$0")" && pwd)"
 repo="${JVECTOR_REPO:-https://github.com/mikepapadim/jvector.git}"
 branch="${JVECTOR_BRANCH:-feat/graph-build-accelerator}"
-src="$here/build/jvector"
+lib="${JVECTOR_LIB:-$here/lib}"
+src="$(dirname "$lib")/build/jvector"
 
 [ -n "${TORNADOVM_HOME:-}" ] || { echo "setup.sh: TORNADOVM_HOME is not set (source scripts/setup-env.sh)" >&2; exit 1; }
 api=$(ls "$TORNADOVM_HOME"/share/java/tornado/tornado-api-*.jar | head -1)
@@ -39,13 +41,13 @@ done
 #    jvector-native is not needed, which avoids its Highway submodule and GCC >= 12 requirement.
 (cd "$src" && ./mvnw -q -B -Pgpu -pl jvector-base,jvector-twenty,jvector-gpu -am package -DskipTests -Drat.skip \
     -Dtornadovm.version="$version")
-rm -rf "$here/lib" && mkdir -p "$here/lib"
+rm -rf "$lib" && mkdir -p "$lib"
 for m in jvector-base jvector-twenty jvector-gpu; do
-    cp "$(ls "$src/$m"/target/"$m"-*.jar | grep -v -e sources -e javadoc | head -1)" "$here/lib/"
+    cp "$(ls "$src/$m"/target/"$m"-*.jar | grep -v -e sources -e javadoc | head -1)" "$lib/"
 done
 (cd "$src" && ./mvnw -q -B -Pgpu -pl jvector-base dependency:copy-dependencies -DincludeScope=runtime \
-    -DoutputDirectory="$here/lib")
-echo "== lib/: $(ls "$here/lib" | tr '\n' ' ')"
+    -DoutputDirectory="$lib")
+echo "== $lib: $(ls "$lib" | tr '\n' ' ')"
 
 # 4. cuVS
 source "$src/jvector-gpu/cuvs-env.sh" "${JVECTOR_GPU_CUVS:-$HOME/.jvector-gpu/cuvs}"

@@ -106,6 +106,7 @@ demo compiles and passes under both run paths (`results/raw/45-tile-ladder/run-a
 | [24](demos/24-cutile-histogram/) † | `CuTileHistogram` | Tile atomics: `PartitionView.atomicAdd` into 256 bins |
 | [25](demos/25-tile-ladder/) † | `TileLadder` | **The TileContext ladder** vs. a fully optimised KernelContext GEMM vs. native CUDA Tile |
 | [26](demos/26-jvector-gpu-index/) ‡ | `JVectorGpuIndex` | A **JVector vector index built on the GPU** (cuVS + a tensor-core Java kernel) vs. JVector's own CPU build: 7.4× faster at 500k × 1024, recall matched, in about a minute |
+| [27](demos/27-jvector-gpu-showcase/) ‡ | `JVectorShowcase` | **The JVector GPU showcase**, five acts on real ada-002 embeddings: build 8× at 100k (live race) and 28× at 1M, a better graph for search, compaction 20×, PQ 3.7× |
 
 **‡** = needs a TornadoVM SDK with `tornado-cuvs` (PR #1155) and its own `setup.sh`; not part of
 `run-all-demos.sh`.

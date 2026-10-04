@@ -1209,3 +1209,27 @@ evidence in `results/raw/46-jvector-gpu-index/` (`MANIFEST.md`):
 - Found while building it: the `tornado` launcher swallows program arguments starting with `--` (TornadoVM #1150);
   `run.sh` passes them with `--params`.
 
+
+## Batch 47 — Demo 27: the JVector GPU showcase (2026-10-04)
+
+Deliverable: `demos/27-jvector-gpu-showcase/` (`JVectorShowcase.java`, `setup.sh`, `prepare.sh`, `run.sh`, `README.md`).
+All Observed; evidence is in `results/raw/47-jvector-gpu-showcase/` (`MANIFEST.md`).
+
+- **What it is:** a five-act stage show on real ada-002 embeddings, with live progress bars, bar charts and a
+  scoreboard. Each act ends with a quality check, and the run prints `PASSED` only if all of them hold.
+  - Race: 100k, CPU vs GPU, both live. 15.8 → 1.9–2.0 s.
+  - Scale: 1M GPU build, live, 9.5 s. The CPU bar is the measured 267.4 s.
+  - Search: JVector's CPU-built 1M graph vs the GPU graph. The GPU graph is ahead on recall and p50 at every beam.
+  - Compaction: 4 segments merged with `GpuCompaction`, live, 14.8 s. The CPU bar is the measured 294.6 s.
+  - PQ: CPU and GPU both live, 13.5 → 3.6 s. Codes match JVector's up to float ties.
+- **PASSED both ways** (`tornado` launcher and `java @argfile`), about 85 s end to end.
+- **Outside `scripts/run-all-demos.sh`**, like demo 26: it needs an SDK with `tornado-cuvs`, the JVector branch
+  `feat/gpu-build-pq-compaction`, and about 13 GB of public datasets. The 69/69 contract is unchanged.
+- **Found while building it:**
+  - A graph loaded with `OnHeapGraphIndex.load` is searched through JVector's concurrent view until
+    `setAllMutationsCompleted()` is called: about 3× slower than the frozen view of a freshly built graph. The demo
+    marks the loaded graph complete so the comparison is fair.
+  - GPU PQ encoding differs from JVector's on exact float ties: 23 of 188.7M codes in an earlier check, all with
+    relative distance difference ≤ 1.5e-7. The check accepts ties and nothing else.
+- **Demo 26's `setup.sh`** gained `JVECTOR_LIB` (output directory). Demo 27's setup reuses it; demo 26's default
+  behaviour is unchanged.
