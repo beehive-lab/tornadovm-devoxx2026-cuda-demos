@@ -6,7 +6,7 @@ Captured 2026-10-04 on the sm_89 host (`environment.txt`): RTX 4090, driver 610.
 
 | log | run | generation | GPU | CPU (same method, 1 thread) | pixels identical | verdict | wall |
 |---|---|---|---|---|---|---|---|
-| `run-tornado-live.log` | tornado, model writes the kernel live | 67.04 tok/s, 559 tokens (prompt + answer) in 8.34 s | 3.1 ms | 1,186.0 ms | 99.79% | PASSED | 15.4 s |
+| `run-tornado-live.log` | tornado, model writes the kernel live | 67.04 tok/s, 559 tokens (prompt + answer) in 8.34 s | 3.1 ms | 1,182.2 ms | 99.79% | PASSED | 15.4 s |
 | `run-java-argfile-reference.log` | java @argfile, `--reference` | none | 3.1 ms | 1,166.1 ms | 99.79% | PASSED | 2.3 s |
 | `run-tornado-reference.log` | tornado, `--reference` | none | 3.1 ms | 1,167.2 ms | 99.79% | PASSED | 2.4 s |
 
