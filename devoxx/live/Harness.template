@@ -1,0 +1,81 @@
+import uk.ac.manchester.tornado.api.TaskGraph;
+import uk.ac.manchester.tornado.api.TornadoExecutionPlan;
+import uk.ac.manchester.tornado.api.annotations.Parallel;
+import uk.ac.manchester.tornado.api.enums.DataTransferMode;
+import uk.ac.manchester.tornado.api.types.arrays.FloatArray;
+import uk.ac.manchester.tornado.api.types.arrays.IntArray;
+
+/**
+ * Runs the Mandelbrot kernel an LLM wrote (inserted below by live.py) with TornadoVM, on the same GPU the LLM ran on.
+ *  1. check: one view on the GPU and the same Java method on the CPU, compared pixel by pixel;
+ *  2. zoom: a zoom into the set, one GPU execution per 8K frame, paced at ~12 frames/s, each frame printed for the terminal.
+ * Protocol (stdout, read by live.py): PHASE, MATCH, FRAME, ROW, END lines.
+ */
+public class Harness {
+
+    // ---- the generated kernel ----
+    /*KERNEL*/
+    // ------------------------------
+
+    static final int COLS = 120, ROWS = 72; // two pixel rows per terminal cell (half blocks)
+
+    public static void main(String[] args) throws Exception {
+        // 1. check: GPU vs the very same method as plain Java on the CPU
+        System.out.println("PHASE check");
+        int w = 1024, h = 768, iterations = 256;
+        FloatArray view = FloatArray.fromElements(-0.6f, 0f, 2.6f);
+        IntArray gpu = new IntArray(w * h);
+        TaskGraph check = new TaskGraph("check")
+                .transferToDevice(DataTransferMode.EVERY_EXECUTION, view)
+                .task("mandelbrot", Harness::mandelbrot, w, h, iterations, view, gpu)
+                .transferToHost(DataTransferMode.EVERY_EXECUTION, gpu);
+        try (TornadoExecutionPlan plan = new TornadoExecutionPlan(check.snapshot())) {
+            plan.execute(); // the first execution JIT-compiles the Java method to CUDA
+        }
+        IntArray cpu = new IntArray(w * h);
+        mandelbrot(w, h, iterations, view, cpu);
+        long same = 0;
+        for (int i = 0; i < w * h; i++) {
+            same += gpu.get(i) == cpu.get(i) ? 1 : 0;
+        }
+        System.out.printf("MATCH %d %d%n", same, (long) w * h);
+
+        // 2. zoom: deeper and deeper into Seahorse Valley, one kernel execution per frame
+        if (args.length > 1 && args[1].equals("wait")) { // live.py says when (after the audience saw the CUDA)
+            new java.io.BufferedReader(new java.io.InputStreamReader(System.in)).readLine();
+        }
+        System.out.println("PHASE zoom");
+        int fw = 7680, fh = 4320, frames = Integer.parseInt(args.length > 0 ? args[0] : "100");
+        long frameNanos = 80_000_000L; // ~12 frames per second: an animation, and long enough to show on the GPU monitor
+        FloatArray zoom = FloatArray.fromElements(-0.743643887f, 0.131825904f, 2.6f);
+        IntArray out = new IntArray(fw * fh);
+        TaskGraph tg = new TaskGraph("zoom")
+                .transferToDevice(DataTransferMode.EVERY_EXECUTION, zoom)
+                .task("mandelbrot", Harness::mandelbrot, fw, fh, 2000, zoom, out)
+                .transferToHost(DataTransferMode.EVERY_EXECUTION, out);
+        try (TornadoExecutionPlan plan = new TornadoExecutionPlan(tg.snapshot())) {
+            for (int f = 0; f < frames; f++) {
+                zoom.set(2, (float) (2.6 * Math.pow(0.93, f)));
+                long t = System.nanoTime();
+                plan.execute();
+                double ms = (System.nanoTime() - t) / 1e6;
+                StringBuilder frame = new StringBuilder();
+                frame.append(String.format("FRAME %d %.2f %.6f%n", f, ms, zoom.get(2)));
+                for (int r = 0; r < ROWS; r++) {
+                    frame.append("ROW");
+                    for (int c = 0; c < COLS; c++) {
+                        frame.append(' ').append(out.get((r * fh / ROWS) * fw + c * fw / COLS));
+                    }
+                    frame.append('\n');
+                }
+                System.out.print(frame);
+                System.out.flush();
+                long rest = frameNanos - (System.nanoTime() - t);
+                if (rest > 0) {
+                    Thread.sleep(rest / 1_000_000, (int) (rest % 1_000_000));
+                }
+            }
+        }
+        System.out.println("END");
+    }
+}

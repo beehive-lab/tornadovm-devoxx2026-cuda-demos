@@ -183,6 +183,8 @@ and are not part of the 7.0.0 suite; see talk 2.
 - `demos/` — one directory per demo: the Java source, its hand-written `.cu` twin, a README
 - `scripts/` — `setup-env.sh`, `run-all-demos.sh`, `run-all-cuda.sh`, `compare-ladder.sh`,
   `verify.sh` (checks deliverables and cited evidence; no GPU needed)
+- `devoxx/` — the Devoxx Belgium 2026 stage scripts: one command per demo, plus fancy versions
+  (spinners, pipelines, bar charts, a live GPU dashboard); see [`devoxx/README.md`](devoxx/README.md)
 - `env/` — the pinned environment and SDK profiles
 - `results/raw/` — immutable raw evidence; `results/failures/` — captured failures
 - `STATE.md` — the study ledger, batch by batch
